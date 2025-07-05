@@ -38,7 +38,8 @@ export default function Header() {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    router.push('/auth');
+    // Take user to homepage instead of forcing them to sign-in page
+    router.push('/');
   };
 
   return (
