@@ -15,7 +15,8 @@ export interface Flyer {
   url: string;
   alt: string;
   link: string;
-  town: string;
+  town?: string;
+  title?: string;
 }
 
 export interface User {

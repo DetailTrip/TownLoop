@@ -43,9 +43,19 @@ export default function SubmitEventForm({ initialData = null }: SubmitEventFormP
   // Effect to update form data if initialData changes (e.g., when navigating to edit a different event)
   useEffect(() => {
     if (initialData) {
+      // Convert UTC datetime to local datetime for form fields
+      let localDateTime = '';
+      if (initialData.date_time) {
+        const utcDate = new Date(initialData.date_time);
+        // Format as YYYY-MM-DDTHH:MM for datetime-local input
+        localDateTime = new Date(utcDate.getTime() - (utcDate.getTimezoneOffset() * 60000))
+          .toISOString()
+          .slice(0, 16);
+      }
+      
       setFormData({
         title: initialData.title,
-        date_time: initialData.date_time || '',
+        date_time: localDateTime,
         location: initialData.location || '',
         description: initialData.description || '',
         tags: initialData.tags || [],
@@ -188,9 +198,13 @@ export default function SubmitEventForm({ initialData = null }: SubmitEventFormP
       }
     }
 
+    // Convert local datetime back to UTC for storage
+    const localDate = new Date(formData.date_time);
+    const utcDateTime = localDate.toISOString();
+
     const eventDataToSave = {
       title: formData.title,
-      date_time: formData.date_time,
+      date_time: utcDateTime,
       location: formData.location,
       description: formData.description,
       tags: formData.tags,

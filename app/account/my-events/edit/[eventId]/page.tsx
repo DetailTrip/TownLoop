@@ -26,32 +26,32 @@ export default function EditEventPage() {
         const { data, error } = await supabase
           .from('events')
           .select('*')
-          .eq('id', eventId)
-          .single();
+          .eq('id', eventId);
 
         if (error) {
           throw error;
         }
 
-        if (data) {
+        if (data && data.length > 0) {
+          const eventData = data[0];
           const fetchedEvent: Event = {
-            id: data.id,
-            title: data.title,
-            description: data.description,
-            date_time: data.date_time,
-            end_time: data.end_time,
-            location: data.location,
-            coordinates: data.coordinates,
-            town: data.town,
-            category: data.category,
-            tags: data.tags || [],
-            image_url: data.image_url,
-            creator_id: data.creator_id,
-            is_featured: data.is_featured,
-            view_count: data.view_count,
-            status: data.status,
-            created_at: data.created_at,
-            updated_at: data.updated_at,
+            id: eventData.id,
+            title: eventData.title,
+            description: eventData.description,
+            date_time: eventData.date_time,
+            end_time: eventData.end_time,
+            location: eventData.location,
+            coordinates: eventData.coordinates,
+            town: eventData.town,
+            category: eventData.category,
+            tags: eventData.tags || [],
+            image_url: eventData.image_url,
+            creator_id: eventData.creator_id,
+            is_featured: eventData.is_featured,
+            view_count: eventData.view_count,
+            status: eventData.status,
+            created_at: eventData.created_at,
+            updated_at: eventData.updated_at,
           };
           setEventData(fetchedEvent);
         } else {
