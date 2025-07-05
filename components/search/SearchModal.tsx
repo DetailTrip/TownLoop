@@ -127,7 +127,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
               <svg className="mx-auto h-12 w-12 text-gray-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.034 0-3.9.785-5.291 2.09M6.343 6.343a8 8 0 1111.314 0M12 2v6.172" />
               </svg>
-              <p>No events found for "{query}"</p>
+              <p>No events found for &quot;{query}&quot;</p>
               <p className="text-sm text-gray-400 mt-1">Try searching with different keywords</p>
             </div>
           )}

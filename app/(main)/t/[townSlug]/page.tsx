@@ -60,7 +60,7 @@ export default function TownPage({ params }: TownPageProps) {
             Events in {townName}
           </h1>
           <p className="mt-2 sm:mt-4 text-sm sm:text-base md:text-lg text-blue-100">
-            Discover what's happening in your community
+            Discover what&apos;s happening in your community
           </p>
         </div>
       </div>

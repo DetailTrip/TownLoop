@@ -1,3 +1,5 @@
+import React from 'react';
+
 export default function AdminDashboardPage() {
   return (
     <div className="container mx-auto px-4 py-8">
@@ -8,21 +10,21 @@ export default function AdminDashboardPage() {
           <h2 className="text-xl font-semibold mb-4">Pending Event Approvals</h2>
           <ul className="divide-y divide-gray-200">
             <li className="py-3 flex justify-between items-center">
-              <span>New Event: <span className="font-medium">"Local Art Fair"</span></span>
+              <span>New Event: <span className="font-medium">&quot;Local Art Fair&quot;</span></span>
               <div>
                 <button className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-md text-sm mr-2">Approve</button>
                 <button className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md text-sm">Reject</button>
               </div>
             </li>
             <li className="py-3 flex justify-between items-center">
-              <span>Updated Event: <span className="font-medium">"Community BBQ"</span></span>
+              <span>Updated Event: <span className="font-medium">&quot;Community BBQ&quot;</span></span>
               <div>
                 <button className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-md text-sm mr-2">Approve</button>
                 <button className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md text-sm">Reject</button>
               </div>
             </li>
             <li className="py-3 flex justify-between items-center">
-              <span>New Flyer: <span className="font-medium">"Charity Run"</span></span>
+              <span>New Flyer: <span className="font-medium">&quot;Charity Run&quot;</span></span>
               <div>
                 <button className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-md text-sm mr-2">Approve</button>
                 <button className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md text-sm">Reject</button>

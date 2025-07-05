@@ -56,7 +56,7 @@ export default function Hero() {
           >
             Find Events
           </button>
-          <p className="mt-2 text-xs text-gray-300">Discover what's happening in your area</p>
+          <p className="mt-2 text-xs text-gray-300">Discover what&apos;s happening in your area</p>
         </div>
 
         {/* Desktop: Full Search Form */}

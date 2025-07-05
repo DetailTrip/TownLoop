@@ -108,7 +108,7 @@ export default function MyEventsPage() {
       <div className="bg-white p-6 rounded-lg shadow-md">
         {error && <p className="text-red-500 mb-4">Error: {error}</p>}
         {myEvents.length === 0 ? (
-          <p className="text-gray-600">You haven't submitted any events yet. <Link href="/submit" className="text-blue-500 hover:underline">Submit one now!</Link></p>
+          <p className="text-gray-600">You haven&apos;t submitted any events yet. <Link href="/submit" className="text-blue-500 hover:underline">Submit one now!</Link></p>
         ) : (
           <ul className="divide-y divide-gray-200">
             {myEvents.map(event => (
