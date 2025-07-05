@@ -13,7 +13,7 @@ export default function ClientLayout({
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
-      <main className="flex-grow pb-16 sm:pb-0">
+      <main className="flex-grow">
         {children}
       </main>
       <Footer />

@@ -154,11 +154,33 @@ export default function Header() {
           </div>
         </div>
 
-        {/* Desktop: Navigation buttons */}
-        <div className="hidden sm:flex justify-center gap-2 md:gap-4 mt-3">
-          <Link href="/submit" aria-label="Submit Event" className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-md transition-colors duration-200 text-sm">Submit Event</Link>
-          <Link href="/events" aria-label="Browse Events" className="bg-purple-500 hover:bg-purple-600 text-white px-3 py-1 rounded-md transition-colors duration-200 text-sm">Browse Events</Link>
-          <Link href="/community" aria-label="Community Hub" className="bg-orange-500 hover:bg-orange-600 text-white px-3 py-1 rounded-md transition-colors duration-200 text-sm">Community Hub</Link>
+        {/* Desktop: Enhanced Navigation */}
+        <div className="hidden lg:flex justify-center gap-1 mt-4">
+          <Link href="/submit" aria-label="Submit Event" className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-all duration-200 text-sm font-medium hover:shadow-md flex items-center gap-2">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            Submit Event
+          </Link>
+          <Link href="/events" aria-label="Browse Events" className="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg transition-all duration-200 text-sm font-medium hover:shadow-md flex items-center gap-2">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            Browse Events
+          </Link>
+          <Link href="/community" aria-label="Community Hub" className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg transition-all duration-200 text-sm font-medium hover:shadow-md flex items-center gap-2">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+            Community Hub
+          </Link>
+        </div>
+        
+        {/* Tablet: Simplified Navigation */}
+        <div className="hidden sm:flex lg:hidden justify-center gap-2 mt-3">
+          <Link href="/submit" aria-label="Submit Event" className="bg-green-500 hover:bg-green-600 text-white px-3 py-1.5 rounded-md transition-colors duration-200 text-sm">Submit Event</Link>
+          <Link href="/events" aria-label="Browse Events" className="bg-purple-500 hover:bg-purple-600 text-white px-3 py-1.5 rounded-md transition-colors duration-200 text-sm">Browse Events</Link>
+          <Link href="/community" aria-label="Community Hub" className="bg-orange-500 hover:bg-orange-600 text-white px-3 py-1.5 rounded-md transition-colors duration-200 text-sm">Community Hub</Link>
         </div>
       </div>
       

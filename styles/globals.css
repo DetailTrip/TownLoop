@@ -63,3 +63,47 @@
     border-radius: 2px;
   }
 }
+
+/* Desktop enhancements */
+@media (min-width: 1024px) {
+  /* Enhanced scrollbars on desktop */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+  }
+
+  /* Desktop hover states */
+  .hover\:shadow-2xl:hover {
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  }
+  
+  /* Desktop focus states */
+  .focus\:ring-4:focus {
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+  }
+  
+  /* Improved desktop animations */
+  .transition-all {
+    transition-property: all;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 200ms;
+  }
+  
+  /* Desktop card hover effects */
+  .group:hover .group-hover\:scale-110 {
+    transform: scale(1.1);
+  }
+}

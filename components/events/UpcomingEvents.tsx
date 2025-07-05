@@ -67,6 +67,8 @@ export default function UpcomingEvents({ townSlug }: { townSlug?: string }) {
       title={townSlug ? `Upcoming in ${formatTownName(townSlug)}` : 'Upcoming This Week'}
       subtitle="Don't miss out on what's happening in your community"
       gridColsClass="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+      showViewAll={!townSlug}
+      viewAllHref="/events"
     >
       {loading && <div className="flex justify-center w-full col-span-full"><Spinner /></div>}
       {error && <p className="text-red-500 col-span-full text-center py-8">Error: {error}</p>}
