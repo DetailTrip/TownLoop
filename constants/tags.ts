@@ -1,0 +1,16 @@
+export const suggestedTags = [
+  'Music',
+  'Family',
+  'Free',
+  'Outdoors',
+  'Food',
+  'Art',
+  'Indoor',
+  'Festival',
+  'Workshop',
+  'Sports',
+  'Charity',
+  'Market',
+  'Kids',
+  'Adults',
+];
