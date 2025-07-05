@@ -4,7 +4,9 @@ import React, { useState, useEffect } from 'react';
 import { suggestedTags } from '@/constants/tags';
 import { supabase } from '@/lib/supabase/client';
 import { useUser } from '@/lib/context/UserContext';
-import { Event } from '@/lib/types'; // Import the Event type
+import { Database } from '@/lib/database.types';
+
+type Event = Database['public']['Tables']['events']['Row'];
 
 // Import reusable UI components
 import TextInput from '@/components/ui/TextInput';
@@ -23,8 +25,7 @@ export default function SubmitEventForm({ initialData = null }: SubmitEventFormP
 
   const [formData, setFormData] = useState({
     title: initialData?.title || '',
-    date: initialData?.date || '',
-    time: initialData?.time || '',
+    date_time: initialData?.date_time || '',
     location: initialData?.location || '',
     description: initialData?.description || '',
     tags: initialData?.tags || [] as string[],
@@ -33,23 +34,23 @@ export default function SubmitEventForm({ initialData = null }: SubmitEventFormP
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [selectedFlyerFile, setSelectedFlyerFile] = useState<File | null>(null);
   const [selectedEventImage, setSelectedEventImage] = useState<File | null>(null);
-  const [eventImagePreview, setEventImagePreview] = useState<string | null>(initialData?.imageUrl || null);
+  const [eventImagePreview, setEventImagePreview] = useState<string | null>(initialData?.image_url || null);
   const [isProcessingAI, setIsProcessingAI] = useState(false);
   const [aiExtractedData, setAiExtractedData] = useState<any>(null); // To store AI results
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formMessage, setFormMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   // Effect to update form data if initialData changes (e.g., when navigating to edit a different event)
   useEffect(() => {
     if (initialData) {
       setFormData({
         title: initialData.title,
-        date: initialData.date,
-        time: initialData.time ? initialData.time.substring(0, 5) : '', // Format to HH:mm
-        location: initialData.location,
-        description: initialData.description,
+        date_time: initialData.date_time || '',
+        location: initialData.location || '',
+        description: initialData.description || '',
         tags: initialData.tags || [],
       });
-      setEventImagePreview(initialData.imageUrl || null);
+      setEventImagePreview(initialData.image_url || null);
     }
   }, [initialData]);
 
@@ -59,6 +60,16 @@ export default function SubmitEventForm({ initialData = null }: SubmitEventFormP
       setFormData(prev => ({
         ...prev,
         tags: value.split(',').map(tag => tag.trim()).filter(tag => tag !== ''),
+      }));
+    } else if (name === 'date') {
+      setFormData(prev => ({
+        ...prev,
+        date_time: `${value}T${prev.date_time ? prev.date_time.split('T')[1] : '00:00'}`,
+      }));
+    } else if (name === 'time') {
+      setFormData(prev => ({
+        ...prev,
+        date_time: `${prev.date_time ? prev.date_time.split('T')[0] : ''}T${value}`,
       }));
     } else {
       setFormData(prev => ({ ...prev, [name]: value }));
@@ -85,12 +96,13 @@ export default function SubmitEventForm({ initialData = null }: SubmitEventFormP
 
   const handleExtractFromFlyer = async () => {
     if (!selectedFlyerFile) {
-      alert('Please select a flyer image first.');
+      setFormMessage({ type: 'error', text: 'Please select a flyer image first.' });
       return;
     }
 
     setIsProcessingAI(true);
     setAiExtractedData(null);
+    setFormMessage(null);
 
     const formData = new FormData();
     formData.append('flyer', selectedFlyerFile);
@@ -107,12 +119,12 @@ export default function SubmitEventForm({ initialData = null }: SubmitEventFormP
 
       const data = await response.json();
       setAiExtractedData(data);
+      setFormMessage({ type: 'success', text: 'AI Extraction Complete! Review the pre-filled fields below.' });
       // Optionally, pre-fill form fields with extracted data here
       setFormData(prev => ({
         ...prev,
         title: data.title || prev.title,
-        date: data.date || prev.date,
-        time: data.time || prev.time,
+        date_time: data.date_time || prev.date_time,
         location: data.location || prev.location,
         description: data.description || prev.description,
         tags: data.tags && data.tags.length > 0 ? data.tags : prev.tags,
@@ -120,7 +132,7 @@ export default function SubmitEventForm({ initialData = null }: SubmitEventFormP
 
     } catch (error) {
       console.error('Error extracting from flyer:', error);
-      alert('Failed to extract data from flyer. Please try again or enter manually.');
+      setFormMessage({ type: 'error', text: 'Failed to extract data from flyer. Please try again or enter manually.' });
     } finally {
       setIsProcessingAI(false);
     }
@@ -129,8 +141,7 @@ export default function SubmitEventForm({ initialData = null }: SubmitEventFormP
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
     if (!formData.title) newErrors.title = 'Event Title is required';
-    if (!formData.date) newErrors.date = 'Date is required';
-    if (!formData.time) newErrors.time = 'Time is required';
+    if (!formData.date_time) newErrors.date_time = 'Date and Time are required';
     if (!formData.location) newErrors.location = 'Location is required';
     if (!formData.description) newErrors.description = 'Description is required';
     if (formData.tags.length === 0) newErrors.tags = 'At least one tag is required';
@@ -141,18 +152,19 @@ export default function SubmitEventForm({ initialData = null }: SubmitEventFormP
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setFormMessage(null);
     if (!validateForm()) {
-      alert('Please correct the errors in the form.');
+      setFormMessage({ type: 'error', text: 'Please correct the errors in the form.' });
       return;
     }
 
     if (!user) {
-      alert('You must be logged in to submit an event.');
+      setFormMessage({ type: 'error', text: 'You must be logged in to submit an event.' });
       return;
     }
 
     setIsSubmitting(true);
-    let finalImageUrl = initialData?.imageUrl || ''; // Start with existing image if editing
+    let finalImageUrl = initialData?.image_url || ''; // Start with existing image if editing
 
     // Handle image upload to Supabase Storage if a new image is selected
     if (selectedEventImage) {
@@ -170,7 +182,7 @@ export default function SubmitEventForm({ initialData = null }: SubmitEventFormP
         finalImageUrl = `${supabase.storage.from('event-images').getPublicUrl(data.path).data.publicUrl}`;
       } catch (error: any) {
         console.error('Error uploading image:', error.message);
-        alert(`Failed to upload image: ${error.message}`);
+        setFormMessage({ type: 'error', text: `Failed to upload image: ${error.message}` });
         setIsSubmitting(false);
         return;
       }
@@ -178,14 +190,13 @@ export default function SubmitEventForm({ initialData = null }: SubmitEventFormP
 
     const eventDataToSave = {
       title: formData.title,
-      date: formData.date,
-      time: formData.time,
+      date_time: formData.date_time,
       location: formData.location,
       description: formData.description,
       tags: formData.tags,
       town: 'timmins', // Assuming a default town for now, or add a town selector to the form
       image_url: finalImageUrl, // Use the uploaded or existing image URL
-      user_id: user.id,
+      creator_id: user.id, // Use creator_id instead of user_id
     };
 
     try {
@@ -210,11 +221,11 @@ export default function SubmitEventForm({ initialData = null }: SubmitEventFormP
       }
 
       console.log('Event submitted successfully:', data);
-      alert(`Event ${initialData ? 'updated' : 'submitted'} successfully!`);
+      setFormMessage({ type: 'success', text: `Event ${initialData ? 'updated' : 'submitted'} successfully!` });
       handleClear();
     } catch (error: any) {
       console.error(`Error ${initialData ? 'updating' : 'submitting'} event:`, error.message);
-      alert(`Failed to ${initialData ? 'update' : 'submit'} event: ${error.message}`);
+      setFormMessage({ type: 'error', text: `Failed to ${initialData ? 'update' : 'submit'} event: ${error.message}` });
     } finally {
       setIsSubmitting(false);
     }
@@ -223,8 +234,7 @@ export default function SubmitEventForm({ initialData = null }: SubmitEventFormP
   const handleClear = () => {
     setFormData({
       title: '',
-      date: '',
-      time: '',
+      date_time: '',
       location: '',
       description: '',
       tags: [] as string[],
@@ -234,6 +244,7 @@ export default function SubmitEventForm({ initialData = null }: SubmitEventFormP
     setSelectedEventImage(null);
     setEventImagePreview(null);
     setAiExtractedData(null);
+    setFormMessage(null);
   };
 
   const handleTagClick = (tag: string) => {
@@ -251,7 +262,7 @@ export default function SubmitEventForm({ initialData = null }: SubmitEventFormP
   if (userLoading) {
     return (
       <div className="container mx-auto px-4 py-8 text-center">
-        Loading user session...
+        <Spinner />
       </div>
     );
   }
@@ -269,6 +280,11 @@ export default function SubmitEventForm({ initialData = null }: SubmitEventFormP
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold text-gray-800 mb-6">{initialData ? 'Edit Event' : 'Submit Your Event'}</h1>
+      {formMessage && (
+        <div className={`p-3 mb-4 rounded-md text-sm ${formMessage.type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+          {formMessage.text}
+        </div>
+      )}
       <form onSubmit={handleSubmit} className="bg-white p-8 rounded-lg shadow-lg">
         <div className="mb-6 p-4 border border-blue-200 rounded-lg bg-blue-50">
           <h2 className="text-xl font-semibold text-blue-800 mb-3">Option 1: Upload a Flyer (AI-Powered)</h2>
@@ -341,18 +357,18 @@ export default function SubmitEventForm({ initialData = null }: SubmitEventFormP
               label="Date" 
               id="date" 
               name="date" 
-              value={formData.date}
+              value={formData.date_time ? formData.date_time.split('T')[0] : ''}
               onChange={handleChange}
-              error={errors.date}
+              error={errors.date_time}
               required
             />
             <TimeInput 
               label="Time" 
               id="time" 
               name="time" 
-              value={formData.time}
+              value={formData.date_time ? formData.date_time.split('T')[1]?.substring(0, 5) : ''}
               onChange={handleChange}
-              error={errors.time}
+              error={errors.date_time}
               required
             />
           </div>

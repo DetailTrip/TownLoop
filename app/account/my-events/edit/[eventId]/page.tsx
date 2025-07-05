@@ -1,12 +1,14 @@
 'use client';
 
-import SubmitEventForm from '@/components/forms/SubmitEventForm';
-import { supabase } from '@/lib/supabase/client';
-import { Event } from '@/lib/types';
-import { useParams } from 'next/navigation';
-import Link from 'next/link';
-import Spinner from '@/components/ui/Spinner';
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import SubmitEventForm from '@/components/forms/SubmitEventForm';
+import Spinner from '@/components/ui/Spinner';
+import { supabase } from '@/lib/supabase/client';
+import { useParams } from 'next/navigation';
+import { Database } from '@/lib/database.types';
+
+type Event = Database['public']['Tables']['events']['Row'];
 
 export default function EditEventPage() {
   const params = useParams();
@@ -35,15 +37,22 @@ export default function EditEventPage() {
           const fetchedEvent: Event = {
             id: data.id,
             title: data.title,
-            date: data.date,
-            time: data.time,
-            location: data.location,
             description: data.description,
-            imageUrl: data.image_url, // Map image_url from DB to imageUrl in interface
-            tags: data.tags || [],
+            date_time: data.date_time,
+            end_time: data.end_time,
+            location: data.location,
+            coordinates: data.coordinates,
             town: data.town,
+            category: data.category,
+            tags: data.tags || [],
+            image_url: data.image_url,
+            creator_id: data.creator_id,
+            is_featured: data.is_featured,
+            view_count: data.view_count,
+            status: data.status,
+            created_at: data.created_at,
+            updated_at: data.updated_at,
           };
-          console.log('Fetched event time:', fetchedEvent.time); // <-- ADDED LOG
           setEventData(fetchedEvent);
         } else {
           setError('Event not found.');

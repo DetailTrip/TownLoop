@@ -4,7 +4,9 @@ import React from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
-import { Event } from '@/lib/types';
+import { Database } from '@/lib/database.types';
+
+type Event = Database['public']['Tables']['events']['Row'];
 
 // Fix for default marker icon not showing
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -34,7 +36,7 @@ export default function EventMap({ events }: EventMapProps) {
           <Popup>
             <strong>{event.title}</strong><br />
             {event.location}<br />
-            {event.date}
+            {new Date(event.date_time).toLocaleDateString()}
           </Popup>
         </Marker>
       ))}

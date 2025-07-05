@@ -1,21 +1,12 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import CardGrid from '@/components/layout/CardGrid';
-import { Flyer } from '@/lib/types';
 import { formatTownName } from '@/lib/utils';
-
-const allMockFlyers: Flyer[] = [
-  { id: 1, url: 'https://picsum.photos/id/242/800/600', alt: 'Flyer for a bake sale', link: '#', town: 'timmins' },
-  { id: 2, url: 'https://picsum.photos/id/243/800/600', alt: 'Flyer for a local concert', link: '#', town: 'kapuskasing' },
-  { id: 3, url: 'https://picsum.photos/id/244/800/600', alt: 'Garage sale announcement', link: '#', town: 'timmins' },
-  { id: 4, url: 'https://picsum.photos/id/245/800/600', alt: 'Community theatre poster', link: '#', town: 'cochrane' },
-  { id: 5, url: 'https://picsum.photos/id/248/800/600', alt: 'Local event flyer', link: '#', town: 'iroquois-falls' },
-];
 
 export default function SpottedFlyers({ townSlug }: { townSlug?: string }) {
   const flyersToDisplay = townSlug 
-    ? allMockFlyers.filter(flyer => flyer.town === townSlug) 
-    : allMockFlyers;
+    ? [] // No mock flyers for specific towns
+    : []; // No mock flyers for all towns
 
   return (
     <div className="w-full">

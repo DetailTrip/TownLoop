@@ -6,6 +6,8 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import TextInput from '@/components/ui/TextInput'; // Import TextInput
 
+import { Database } from '@/lib/database.types';
+
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
@@ -33,6 +35,24 @@ export default function AuthPage() {
 
       if (error) {
         throw error;
+      }
+
+      if (data.user) {
+        // Ensure a profile exists for the user
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .upsert({
+            id: data.user.id,
+            username: data.user.email?.split('@')[0], // Basic username from email
+          }, { onConflict: 'id' });
+
+        if (profileError) {
+          console.error('Error upserting profile:', profileError);
+          setMessage(`Authentication successful, but failed to create profile: ${profileError.message}`);
+          setMessageType('error');
+          setLoading(false);
+          return;
+        }
       }
 
       if (isLogin) {

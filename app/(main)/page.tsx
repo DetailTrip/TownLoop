@@ -7,7 +7,7 @@ export default function HomePage() {
     <main>
       <Hero />
       <UpcomingEvents />
-      <CommunityHub />
+      {/* <CommunityHub /> */}
       {/* The rest of the homepage modules will go here */}
     </main>
   );

@@ -2,10 +2,12 @@
 
 import { useUser } from '@/lib/context/UserContext';
 import { supabase } from '@/lib/supabase/client';
-import { Event } from '@/lib/types';
 import { useState, useEffect } from 'react';
+import { Database } from '@/lib/database.types';
 import Link from 'next/link';
 import Spinner from '@/components/ui/Spinner';
+
+type Event = Database['public']['Tables']['events']['Row'];
 
 export default function MyEventsPage() {
   const { user, loading: userLoading } = useUser();
@@ -25,8 +27,8 @@ export default function MyEventsPage() {
       try {
         const { data, error } = await supabase
           .from('events')
-          .select('id, title, date, time, location, description, image_url, tags, town')
-          .eq('user_id', user.id) // Filter by the current user's ID
+          .select('id, title, description, date_time, location, image_url, tags, town')
+          .eq('creator_id', user.id) // Filter by the current user's ID
           .order('created_at', { ascending: false });
 
         if (error) {
@@ -36,14 +38,13 @@ export default function MyEventsPage() {
         const fetchedEvents: Event[] = data.map(item => ({
           id: item.id,
           title: item.title,
-          date: item.date,
-          time: item.time,
-          location: item.location,
           description: item.description,
-          imageUrl: item.image_url, // Map image_url from DB to imageUrl in interface
+          date_time: item.date_time,
+          location: item.location,
+          image_url: item.image_url, // Use image_url directly
           tags: item.tags || [],
           town: item.town,
-        }));
+        })) as Event[];
         setMyEvents(fetchedEvents);
       } catch (err: any) {
         setError(err.message);
@@ -112,7 +113,7 @@ export default function MyEventsPage() {
           <ul className="divide-y divide-gray-200">
             {myEvents.map(event => (
               <li key={event.id} className="py-3 flex justify-between items-center">
-                <span>{event.title} ({event.date})</span>
+                <span>{event.title} ({new Date(event.date_time).toLocaleDateString()})</span>
                 <div>
                   <Link href={`/events/${event.id}`} className="text-blue-500 hover:underline mr-4">View</Link>
                   <Link href={`/account/my-events/edit/${event.id}`} className="text-blue-500 hover:underline mr-4">Edit</Link>

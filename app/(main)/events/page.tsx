@@ -2,12 +2,14 @@
 import EventCard from '@/components/events/EventCard';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import { Event } from '@/lib/types';
 import { supabase } from '@/lib/supabase/client';
 import CardGrid from '@/components/layout/CardGrid';
 import { suggestedTags } from '@/constants/tags';
 import EventMap from '@/components/map/EventMap'; // Import EventMap
 import Spinner from '@/components/ui/Spinner'; // Import Spinner
+import { Database } from '@/lib/database.types';
+
+type Event = Database['public']['Tables']['events']['Row'];
 
 const EVENTS_PER_PAGE = 12; // Define how many events per page
 
@@ -35,7 +37,7 @@ export default function EventsPage() {
         const from = (currentPage - 1) * EVENTS_PER_PAGE;
         const to = from + EVENTS_PER_PAGE - 1;
 
-        let query = supabase.from('events').select('id, title, date, time, location, description, image_url, tags, town', { count: 'exact' });
+        let query = supabase.from('events').select('id, title, description, date_time, location, image_url, tags, town', { count: 'exact' });
 
         if (find && find !== 'an event') {
           // In a real app, this would filter by event type/category based on 'find'
@@ -51,7 +53,7 @@ export default function EventsPage() {
         }
 
         const { data, error, count } = await query
-          .order('date', { ascending: true })
+          .order('date_time', { ascending: true })
           .range(from, to);
 
         if (error) {
@@ -61,14 +63,13 @@ export default function EventsPage() {
         const fetchedEvents: Event[] = data.map(item => ({
           id: item.id,
           title: item.title,
-          date: item.date,
-          time: item.time,
-          location: item.location,
           description: item.description,
-          imageUrl: item.image_url, // Map image_url from DB to imageUrl in interface
+          date_time: item.date_time,
+          location: item.location,
+          image_url: item.image_url,
           tags: item.tags || [],
           town: item.town,
-        }));
+        })) as Event[];
 
         setEvents(fetchedEvents);
         setHasMore(count ? count > to + 1 : false);
