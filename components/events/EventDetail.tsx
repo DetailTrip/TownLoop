@@ -1,27 +1,78 @@
+'use client';
+
 import Image from 'next/image';
+import { Event } from '@/lib/types';
+import { supabase } from '@/lib/supabase/client';
+import { useState, useEffect } from 'react';
+import { useParams } from 'next/navigation';
+import Spinner from '@/components/ui/Spinner';
 
-// This is a placeholder type. We will replace it with our actual data model from /lib/types later.
-type Event = {
-  title: string;
-  date: string;
-  time: string;
-  location: string;
-  description: string;
-  imageUrl: string;
-  tags: string[];
-};
+export default function EventDetail() {
+  const params = useParams();
+  const eventId = params.eventId as string;
 
-const mockEvent: Event = {
-  title: 'Sample Community Festival',
-  date: 'Saturday, August 10, 2025',
-  time: '10:00 AM - 6:00 PM',
-  location: 'Main Street Park, Timmins',
-  description: 'Join us for a day of fun, food, and music! Featuring local artists, food trucks, and activities for all ages. Don\'t miss the annual pie-eating contest at 3 PM!',
-  imageUrl: 'https://picsum.photos/id/246/1200/800',
-  tags: ['Festival', 'Family', 'Food', 'Music', 'Free'],
-};
+  const [event, setEvent] = useState<Event | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-export default function EventDetail({ event = mockEvent }: { event?: Event }) {
+  useEffect(() => {
+    const fetchEvent = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const { data, error } = await supabase
+          .from('events')
+          .select('*')
+          .eq('id', eventId)
+          .single();
+
+        if (error) {
+          throw error;
+        }
+
+        if (data) {
+          const fetchedEvent: Event = {
+            id: data.id,
+            title: data.title,
+            date: data.date,
+            time: data.time,
+            location: data.location,
+            description: data.description,
+            imageUrl: data.image_url, // Map image_url from DB to imageUrl in interface
+            tags: data.tags || [],
+            town: data.town,
+          };
+          setEvent(fetchedEvent);
+        } else {
+          setError('Event not found.');
+        }
+      } catch (err: any) {
+        setError(err.message);
+        console.error('Error fetching event details:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEvent();
+  }, [eventId]);
+
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-8 text-center">
+        <Spinner />
+      </div>
+    );
+  }
+
+  if (error) {
+    return <div className="container mx-auto px-4 py-8 text-center text-red-500">Error: {error}</div>;
+  }
+
+  if (!event) {
+    return <div className="container mx-auto px-4 py-8 text-center">Event not found.</div>;
+  }
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="bg-white rounded-lg shadow-lg overflow-hidden">

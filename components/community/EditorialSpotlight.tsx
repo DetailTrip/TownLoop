@@ -20,7 +20,7 @@ export default function EditorialSpotlight() {
       </div>
       <div className="p-6">
         <p className="text-gray-700 mb-4">{spotlightEvent.description}</p>
-        <Link href={spotlightEvent.link} className="font-bold text-blue-600 hover:underline">
+        <Link href={spotlightEvent.link} aria-label={`Learn more about ${spotlightEvent.title}`} className="font-bold text-blue-600 hover:underline">
           Learn More &rarr;
         </Link>
       </div>

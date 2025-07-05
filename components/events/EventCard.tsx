@@ -1,14 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
-
-// This is a placeholder type. We will replace it with our actual data model from /lib/types later.
-type Event = {
-  title: string;
-  date: string;
-  location: string;
-  imageUrl: string;
-  tags: string[];
-};
+import { Event } from '@/lib/types';
 
 const getTagColor = (tag: string) => {
   switch (tag.toLowerCase()) {
@@ -29,8 +21,8 @@ const getTagColor = (tag: string) => {
 
 export default function EventCard({ event }: { event: Event }) {
   return (
-    <Link href={`/events/${event.title.toLowerCase().replace(/ /g, '-')}`} className="block bg-white rounded-lg shadow-md overflow-hidden w-72 flex-shrink-0 hover:shadow-lg transition-shadow duration-300">
-      <div className="relative h-40">
+    <Link href={`/events/${event.id}`} aria-label={`View details for ${event.title}`} className="block bg-white rounded-lg shadow-md overflow-hidden w-full sm:w-72 flex-shrink-0 hover:shadow-lg transition-shadow duration-300">
+      <div className="relative h-40 w-full">
         <Image src={event.imageUrl} width={288} height={160} alt={event.title} className="object-cover w-full h-full" />
       </div>
       <div className="p-4">

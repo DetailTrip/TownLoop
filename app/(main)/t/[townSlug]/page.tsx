@@ -1,9 +1,10 @@
 import UpcomingEvents from '@/components/events/UpcomingEvents';
 import SpottedFlyers from '@/components/community/SpottedFlyers';
+import { formatTownName } from '@/lib/utils';
 
 export default function TownPage({ params }: { params: { townSlug: string } }) {
   const { townSlug } = params;
-  const formattedTownName = townSlug.replace(/-/g, ' ').split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+  const formattedTownName = formatTownName(townSlug);
 
   return (
     <div className="container mx-auto px-4 py-8">
