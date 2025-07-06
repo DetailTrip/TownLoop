@@ -3,12 +3,13 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { towns } from '@/constants';
 import { useUser } from '@/lib/context/UserContext';
 import { supabase } from '@/lib/supabase/client';
 import SearchModal from '@/components/search/SearchModal';
 import ImprovedTownSelector from './ImprovedTownSelector';
 
-export default function Header() {
+export default function HeaderWithImprovedSelector() {
   const router = useRouter();
   const { user, session, loading } = useUser();
   const [mounted, setMounted] = useState(false);
@@ -31,7 +32,6 @@ export default function Header() {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    // Take user to homepage instead of forcing them to sign-in page
     router.push('/');
   };
 
@@ -69,9 +69,9 @@ export default function Header() {
             )}
           </div>
 
-          {/* Desktop: All controls */}
-          <div className="hidden sm:flex items-center gap-2 md:gap-4">
-            {/* Town Selector */}
+          {/* Desktop: All controls - IMPROVED VERSION */}
+          <div className="hidden sm:flex items-center gap-2 md:gap-3">
+            {/* Improved Town Selector */}
             <ImprovedTownSelector />
             
             {/* Visual separator */}
@@ -95,7 +95,7 @@ export default function Header() {
               <div className="w-16 h-8 bg-gray-200 animate-pulse rounded-md"></div>
             ) : user ? (
               <>
-                <Link href="/account/my-events" className="text-gray-600 hover:text-gray-800 px-2 py-1 rounded-md hover:bg-gray-100 transition-colors duration-200 text-sm">My Events</Link>
+                <Link href="/account/my-events" className="text-gray-600 hover:text-gray-800 px-2 py-1 rounded-md hover:bg-gray-100 transition-colors duration-200 text-sm whitespace-nowrap">My Events</Link>
                 <button onClick={handleLogout} className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md transition-colors duration-200 text-sm">Logout</button>
               </>
             ) : (
@@ -104,9 +104,9 @@ export default function Header() {
           </div>
         </div>
 
-        {/* Mobile: Navigation buttons row */}
+        {/* Mobile: Town Selector + Navigation */}
         <div className="sm:hidden">
-          {/* Town Selector - Full width on mobile */}
+          {/* Improved Town Selector - Full width on mobile */}
           <div className="mb-3">
             <ImprovedTownSelector />
           </div>

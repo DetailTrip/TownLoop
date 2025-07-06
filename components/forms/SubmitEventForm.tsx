@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { suggestedTags } from '@/constants/tags';
+import TagSelector from './TagSelector';
 import { supabase } from '@/lib/supabase/client';
 import { useUser } from '@/lib/context/UserContext';
+import { eventCategories } from '@/constants';
 import { Database } from '@/lib/database.types';
 
 type Event = Database['public']['Tables']['events']['Row'];
@@ -13,6 +14,7 @@ import TextInput from '@/components/ui/TextInput';
 import DateInput from '@/components/ui/DateInput';
 import TimeInput from '@/components/ui/TimeInput';
 import TextAreaInput from '@/components/ui/TextAreaInput';
+import SelectInput from '@/components/ui/SelectInput';
 import Link from 'next/link';
 import Spinner from '@/components/ui/Spinner';
 
@@ -28,6 +30,7 @@ export default function SubmitEventForm({ initialData = null }: SubmitEventFormP
     date_time: initialData?.date_time || '',
     location: initialData?.location || '',
     description: initialData?.description || '',
+    category: initialData?.category || '',
     tags: initialData?.tags || [] as string[],
   });
 
@@ -58,13 +61,14 @@ export default function SubmitEventForm({ initialData = null }: SubmitEventFormP
         date_time: localDateTime,
         location: initialData.location || '',
         description: initialData.description || '',
+        category: initialData.category || '',
         tags: initialData.tags || [],
       });
       setEventImagePreview(initialData.image_url || null);
     }
   }, [initialData]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     if (name === 'tags') {
       setFormData(prev => ({
@@ -154,6 +158,7 @@ export default function SubmitEventForm({ initialData = null }: SubmitEventFormP
     if (!formData.date_time) newErrors.date_time = 'Date and Time are required';
     if (!formData.location) newErrors.location = 'Location is required';
     if (!formData.description) newErrors.description = 'Description is required';
+    if (!formData.category) newErrors.category = 'Category is required';
     if (formData.tags.length === 0) newErrors.tags = 'At least one tag is required';
     
     setErrors(newErrors);
@@ -207,6 +212,7 @@ export default function SubmitEventForm({ initialData = null }: SubmitEventFormP
       date_time: utcDateTime,
       location: formData.location,
       description: formData.description,
+      category: formData.category,
       tags: formData.tags,
       town: 'timmins', // Assuming a default town for now, or add a town selector to the form
       image_url: finalImageUrl, // Use the uploaded or existing image URL
@@ -251,6 +257,7 @@ export default function SubmitEventForm({ initialData = null }: SubmitEventFormP
       date_time: '',
       location: '',
       description: '',
+      category: '',
       tags: [] as string[],
     });
     setErrors({});
@@ -259,18 +266,6 @@ export default function SubmitEventForm({ initialData = null }: SubmitEventFormP
     setEventImagePreview(null);
     setAiExtractedData(null);
     setFormMessage(null);
-  };
-
-  const handleTagClick = (tag: string) => {
-    setFormData(prev => {
-      const currentTags = new Set(prev.tags);
-      if (currentTags.has(tag)) {
-        currentTags.delete(tag);
-      } else {
-        currentTags.add(tag);
-      }
-      return { ...prev, tags: Array.from(currentTags) };
-    });
   };
 
   if (userLoading) {
@@ -399,6 +394,21 @@ export default function SubmitEventForm({ initialData = null }: SubmitEventFormP
             />
           </div>
           <div className="mb-5">
+            <SelectInput 
+              label="Category" 
+              id="category" 
+              name="category" 
+              value={formData.category}
+              onChange={handleChange}
+              error={errors.category}
+              required
+              options={[
+                { value: '', label: 'Select a category...' },
+                ...eventCategories.map(cat => ({ value: cat.id, label: cat.name }))
+              ]}
+            />
+          </div>
+          <div className="mb-5">
             <TextAreaInput 
               label="Description" 
               id="description" 
@@ -411,31 +421,17 @@ export default function SubmitEventForm({ initialData = null }: SubmitEventFormP
               placeholder="Tell us more about your event..." 
             />
           </div>
+          
+          {/* Tags */}
           <div className="mb-6">
-            <label htmlFor="tags" className="block text-gray-700 text-sm font-bold mb-2">Tags (comma-separated) <span className="text-red-500">*</span></label>
-            <input 
-              type="text" 
-              id="tags" 
-              name="tags" 
-              value={formData.tags.join(', ')}
-              onChange={handleChange}
-              className={`shadow appearance-none border ${errors.tags ? 'border-red-500' : 'border-gray-300'} rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
-              placeholder="e.g., Music, Family, Free" 
+            <TagSelector
+              selectedTags={formData.tags}
+              onTagsChange={(tags) => setFormData(prev => ({ ...prev, tags }))}
+              maxTags={8}
             />
             {errors.tags && <p className="text-red-500 text-xs italic mt-2">{errors.tags}</p>}
-            <div className="mt-2 flex flex-wrap gap-2">
-              {suggestedTags.map(tag => (
-                <button 
-                  key={tag} 
-                  type="button" 
-                  onClick={() => handleTagClick(tag)}
-                  className={`text-xs px-3 py-1 rounded-full transition-colors duration-200 ${formData.tags.includes(tag) ? 'bg-blue-500 text-white' : 'bg-gray-200 hover:bg-gray-300 text-gray-700'}`}
-                >
-                  {tag}
-                </button>
-              ))}
-            </div>
           </div>
+          
           {/* Manual form fields end here */}
         </div>
 

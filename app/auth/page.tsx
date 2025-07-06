@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import TextInput from '@/components/ui/TextInput'; // Import TextInput
+import Script from 'next/script';
 
 import { Database } from '@/lib/database.types';
 
@@ -15,7 +16,19 @@ export default function AuthPage() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [messageType, setMessageType] = useState<'success' | 'error' | null>(null);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [hCaptchaLoaded, setHCaptchaLoaded] = useState(false);
   const router = useRouter();
+
+  // Handle hCaptcha verification
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      (window as any).onHCaptchaVerify = (token: string) => {
+        console.log('hCaptcha verified:', token);
+        setCaptchaToken(token);
+      };
+    }
+  }, []);
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,12 +36,35 @@ export default function AuthPage() {
     setMessage(null);
     setMessageType(null);
 
+    // Check if captcha is completed
+    if (!captchaToken) {
+      setMessage('Please complete the captcha verification');
+      setMessageType('error');
+      setLoading(false);
+      return;
+    }
+
+    // Get hCaptcha token from state instead of window object
+    const currentCaptchaToken = captchaToken;
+
     try {
       let authResponse;
       if (isLogin) {
-        authResponse = await supabase.auth.signInWithPassword({ email, password });
+        authResponse = await supabase.auth.signInWithPassword({ 
+          email, 
+          password,
+          options: {
+            captchaToken: currentCaptchaToken || undefined
+          }
+        });
       } else {
-        authResponse = await supabase.auth.signUp({ email, password });
+        authResponse = await supabase.auth.signUp({ 
+          email, 
+          password,
+          options: {
+            captchaToken: currentCaptchaToken || undefined
+          }
+        });
       }
 
       const { data, error } = authResponse;
@@ -73,7 +109,12 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+    <>
+      <Script 
+        src="https://js.hcaptcha.com/1/api.js" 
+        onLoad={() => setHCaptchaLoaded(true)}
+      />
+      <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
         <div className="text-center mb-4">
           <Link href="/" className="text-blue-500 hover:text-blue-800 text-sm">&larr; Back to Home</Link>
@@ -111,6 +152,16 @@ export default function AuthPage() {
               required
             />
           </div>
+          
+          {/* hCaptcha Widget */}
+          <div className="mb-6">
+            <div 
+              className="h-captcha" 
+              data-sitekey="3e82a2ee-aa6c-4404-bcf0-ffb4111a0dc6"
+              data-callback="onHCaptchaVerify"
+            ></div>
+          </div>
+
           <div className="flex items-center justify-between">
             <button 
               type="submit" 
@@ -138,6 +189,7 @@ export default function AuthPage() {
           </p>
         </form>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

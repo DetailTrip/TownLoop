@@ -2,6 +2,9 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import FavoriteButton from './FavoriteButton';
+import ShareButton from './ShareButton';
+import EventComments from './EventComments';
 import { supabase } from '@/lib/supabase/client';
 import { useState, useEffect } from 'react';
 import Spinner from '@/components/ui/Spinner';
@@ -169,24 +172,12 @@ export default function EventDetail({ eventId }: EventDetailProps) {
     minute: '2-digit', 
     hour12: true 
   });
-
-  const handleShare = async () => {
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: event.title,
-          text: event.description || 'Check out this event!',
-          url: window.location.href,
-        });
-      } catch (err) {
-        console.log('Error sharing:', err);
-      }
-    } else {
-      // Fallback: copy to clipboard
-      navigator.clipboard.writeText(window.location.href);
-      // You could add a toast notification here
-    }
-  };
+  const dateString = eventDate.toLocaleDateString('en-US', { 
+    weekday: 'long', 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric' 
+  });
 
   return (
     <>
@@ -270,15 +261,11 @@ export default function EventDetail({ eventId }: EventDetailProps) {
 
             {/* Action Buttons - Mobile First */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-              <button
-                onClick={handleShare}
-                className="flex flex-col items-center justify-center bg-blue-50 hover:bg-blue-100 text-blue-700 p-3 rounded-lg transition-colors duration-200 active:scale-95"
-              >
-                <svg className="h-5 w-5 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
-                </svg>
-                <span className="text-xs font-medium">Share</span>
-              </button>
+              <ShareButton 
+                eventId={event.id}
+                eventTitle={event.title}
+                eventDate={dateString}
+              />
               
               <button className="flex flex-col items-center justify-center bg-green-50 hover:bg-green-100 text-green-700 p-3 rounded-lg transition-colors duration-200 active:scale-95">
                 <svg className="h-5 w-5 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -287,12 +274,10 @@ export default function EventDetail({ eventId }: EventDetailProps) {
                 <span className="text-xs font-medium">Calendar</span>
               </button>
               
-              <button className="flex flex-col items-center justify-center bg-purple-50 hover:bg-purple-100 text-purple-700 p-3 rounded-lg transition-colors duration-200 active:scale-95">
-                <svg className="h-5 w-5 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                </svg>
-                <span className="text-xs font-medium">Save</span>
-              </button>
+              <div className="flex flex-col items-center justify-center">
+                <FavoriteButton eventId={event.id} size="lg" className="mb-2" />
+                <span className="text-xs font-medium text-purple-700">Save</span>
+              </div>
               
               <a
                 href={`https://maps.google.com/?q=${encodeURIComponent(event.location || '')}`}
@@ -338,6 +323,9 @@ export default function EventDetail({ eventId }: EventDetailProps) {
           </div>
         </article>
       </div>
+      
+      {/* Comments Section */}
+      <EventComments eventId={eventId} />
       
       {/* Related Events */}
       <RelatedEvents 

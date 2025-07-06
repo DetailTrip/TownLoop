@@ -78,6 +78,61 @@ export type Database = {
           },
         ];
       };
+      comments: {
+        Row: {
+          content: string;
+          created_at: string;
+          event_id: string | null;
+          id: string;
+          is_deleted: boolean | null;
+          parent_id: string | null;
+          updated_at: string | null;
+          user_id: string | null;
+        };
+        Insert: {
+          content: string;
+          created_at?: string;
+          event_id?: string | null;
+          id?: string;
+          is_deleted?: boolean | null;
+          parent_id?: string | null;
+          updated_at?: string | null;
+          user_id?: string | null;
+        };
+        Update: {
+          content?: string;
+          created_at?: string;
+          event_id?: string | null;
+          id?: string;
+          is_deleted?: boolean | null;
+          parent_id?: string | null;
+          updated_at?: string | null;
+          user_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "comments_event_id_fkey";
+            columns: ["event_id"];
+            isOneToOne: false;
+            referencedRelation: "events";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "comments_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "comments_parent_id_fkey";
+            columns: ["parent_id"];
+            isOneToOne: false;
+            referencedRelation: "comments";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       event_interactions: {
         Row: {
           created_at: string;

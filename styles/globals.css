@@ -48,6 +48,62 @@
   outline: none;
 }
 
+/* Leaflet map container fixes */
+.leaflet-container {
+  /* Prevent map from interfering with page scroll */
+  touch-action: pan-x pan-y;
+  /* Ensure proper containment */
+  position: relative;
+  overflow: hidden;
+}
+
+/* Ensure map stays contained */
+.leaflet-container .leaflet-control-container {
+  pointer-events: auto;
+}
+
+.leaflet-container .leaflet-control-container .leaflet-control {
+  margin: 10px;
+}
+
+/* Fix map container on mobile */
+@media (max-width: 768px) {
+  .leaflet-container {
+    /* More restrictive touch handling on mobile */
+    touch-action: manipulation;
+    /* Prevent overscroll/rubber banding */
+    overscroll-behavior: contain;
+  }
+  
+  /* Prevent map dragging from affecting page scroll */
+  .leaflet-container .leaflet-map-pane {
+    /* Contain map interactions */
+    contain: layout style paint;
+    /* Prevent touch events from bubbling up */
+    touch-action: manipulation;
+  }
+  
+  /* Disable certain gestures that might interfere */
+  .leaflet-container .leaflet-map-pane * {
+    touch-action: manipulation;
+  }
+  
+  /* Ensure zoom controls are easily accessible on mobile */
+  .leaflet-container .leaflet-control-zoom {
+    border: 2px solid #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  }
+  
+  .leaflet-container .leaflet-control-zoom a {
+    width: 40px;
+    height: 40px;
+    line-height: 38px;
+    font-size: 20px;
+    font-weight: bold;
+  }
+}
+
 /* Custom scrollbar for mobile */
 @media (max-width: 768px) {
   ::-webkit-scrollbar {

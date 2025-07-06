@@ -2,6 +2,7 @@
 
 import EventCard from './EventCard';
 import CardGrid from '@/components/layout/CardGrid';
+import CategoryFilter from './CategoryFilter';
 import { supabase } from '@/lib/supabase/client';
 import { useState, useEffect } from 'react';
 import Spinner from '@/components/ui/Spinner';
@@ -15,6 +16,7 @@ export default function UpcomingEvents({ townSlug }: { townSlug?: string }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -27,30 +29,26 @@ export default function UpcomingEvents({ townSlug }: { townSlug?: string }) {
       setLoading(true);
       setError(null);
       try {
-        let query = supabase.from('events').select('id, title, description, date_time, location, image_url, tags, town');
+        let query = supabase
+          .from('events')
+          .select('*')
+          .eq('status', 'active'); // Only show active events
 
         if (townSlug) {
           query = query.eq('town', townSlug);
         }
 
-        const { data, error } = await query.order('date_time', { ascending: true }).limit(5);
+        if (selectedCategory) {
+          query = query.eq('category', selectedCategory);
+        }
+
+        const { data, error } = await query.order('date_time', { ascending: true }).limit(12);
 
         if (error) {
           throw error;
         }
         
-        const fetchedEvents: Event[] = data.map(item => ({
-          id: item.id,
-          title: item.title,
-          description: item.description,
-          date_time: item.date_time,
-          location: item.location,
-          image_url: item.image_url,
-          tags: item.tags || [],
-          town: item.town,
-        })) as Event[]; // Cast to Event[] to satisfy TypeScript
-
-        setEvents(fetchedEvents);
+        setEvents(data || []);
       } catch (err: any) {
         setError(err.message);
         console.error('Error fetching upcoming events:', err);
@@ -60,16 +58,25 @@ export default function UpcomingEvents({ townSlug }: { townSlug?: string }) {
     };
 
     fetchEvents();
-  }, [townSlug, mounted]);
+  }, [townSlug, selectedCategory, mounted]);
 
   return (
-    <CardGrid 
-      title={townSlug ? `Upcoming in ${formatTownName(townSlug)}` : 'Upcoming This Week'}
-      subtitle="Don't miss out on what's happening in your community"
-      gridColsClass="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-      showViewAll={!townSlug}
-      viewAllHref="/events"
-    >
+    <div>
+      {/* Category Filter */}
+      <div className="mb-6">
+        <CategoryFilter 
+          selectedCategory={selectedCategory}
+          onCategoryChange={setSelectedCategory}
+        />
+      </div>
+      
+      <CardGrid 
+        title={townSlug ? `Upcoming in ${formatTownName(townSlug)}` : 'Upcoming This Week'}
+        subtitle="Don't miss out on what's happening in your community"
+        gridColsClass="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+        showViewAll={!townSlug}
+        viewAllHref="/events"
+      >
       {loading && <div className="flex justify-center w-full col-span-full"><Spinner /></div>}
       {error && <p className="text-red-500 col-span-full text-center py-8">Error: {error}</p>}
       {!loading && !error && events.length === 0 && (
@@ -86,6 +93,7 @@ export default function UpcomingEvents({ townSlug }: { townSlug?: string }) {
           <EventCard key={event.title} event={event} />
         ))
       )}
-    </CardGrid>
+      </CardGrid>
+    </div>
   );
 }

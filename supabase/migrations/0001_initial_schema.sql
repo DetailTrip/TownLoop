@@ -1,3 +1,14 @@
+-- Towns table (create first since profiles references it)
+CREATE TABLE public.towns (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  slug TEXT UNIQUE NOT NULL,
+  name TEXT NOT NULL,
+  region TEXT,
+  coordinates POINT,
+  population INTEGER,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
 -- Users table (extends Supabase auth.users)
 CREATE TABLE public.profiles (
   id UUID REFERENCES auth.users(id) PRIMARY KEY,
@@ -10,17 +21,6 @@ CREATE TABLE public.profiles (
   badges JSONB DEFAULT '[]',
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
--- Towns table
-CREATE TABLE public.towns (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  slug TEXT UNIQUE NOT NULL,
-  name TEXT NOT NULL,
-  region TEXT,
-  coordinates POINT,
-  population INTEGER,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- Events table (optimized for your features)

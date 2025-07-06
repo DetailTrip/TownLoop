@@ -1,5 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import FavoriteButton from './FavoriteButton';
+import { getTagDisplayName } from '@/constants/tags';
 import { Database } from '@/lib/database.types';
 
 type Event = Database['public']['Tables']['events']['Row'];
@@ -55,6 +57,11 @@ export default function EventCard({ event }: { event: Event }) {
             Featured
           </div>
         )}
+        
+        {/* Favorite button */}
+        <div className="absolute top-3 right-3" onClick={(e) => e.preventDefault()}>
+          <FavoriteButton eventId={event.id} size="sm" />
+        </div>
       </div>
       <div className="p-4 sm:p-5 lg:p-6">
         <h3 className="font-bold text-base sm:text-lg lg:text-xl mb-3 line-clamp-2 group-hover:text-blue-600 transition-colors duration-200">
@@ -87,7 +94,7 @@ export default function EventCard({ event }: { event: Event }) {
         <div className="flex flex-wrap gap-2">
           {event.tags && event.tags.slice(0, 4).map(tag => (
             <span key={tag} className={`px-2.5 py-1 text-xs lg:text-sm rounded-full ${getTagColor(tag)} font-medium`}>
-              #{tag}
+              {getTagDisplayName(tag)}
             </span>
           ))}
           {event.tags && event.tags.length > 4 && (

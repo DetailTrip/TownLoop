@@ -46,7 +46,7 @@ export default function Hero() {
         </h1>
         <p className="mt-4 sm:mt-6 text-sm sm:text-lg md:text-xl lg:text-2xl text-gray-200 max-w-3xl mx-auto">
           Your guide to Timmins, Kapuskasing & Beyond.<br className="hidden md:inline" />
-          <span className="hidden lg:inline"> Discover local events, connect with your community, and never miss what's happening around you.</span>
+          <span className="hidden lg:inline"> Discover local events, connect with your community, and never miss what&apos;s happening around you.</span>
         </p>
         
         {/* Mobile: Simple Search */}
